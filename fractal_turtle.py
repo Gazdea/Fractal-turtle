@@ -1,14 +1,14 @@
+from msilib.schema import File
 import turtle
-import tkinter
+import tkinter as tk
+from tkinter.scrolledtext import ScrolledText
 
 # d - distance a - angle F - forward (+) - right (-) - left 
 # X - penup forward c - pencolor s - pensize c - color
 # C - clear x - setx y - sety
-def draw_l_system(t, instruction):
-    distance = 10
+def draw(t, instruction):
+    distance = 50
     angle = 90
-    t.hideturtle()
-    t.speed(0)
     
     commands = {
         'd': lambda: set_distance(),
@@ -29,6 +29,7 @@ def draw_l_system(t, instruction):
         distance_str = instruction[instruction.index('d') + 1:instruction.index('/', instruction.index('d') + 1)]
         distance = int(distance_str)
         instruction = instruction[instruction.index('d') + len(distance_str) + 1:]
+        
 
     def set_angle():
         nonlocal instruction, angle
@@ -61,14 +62,11 @@ def draw_l_system(t, instruction):
         instruction = instruction[instruction.index('y') + len(Sety) + 1:]
 
     while instruction:
-        command = instruction[0]
-        if command in commands:
-            commands[command]()
-            # print(command)
+        if instruction[0] in commands:
+            commands[instruction[0]]()
             instruction = instruction[1:]
         else:
             print("Error")
-            break
 
 def create_l_system(iters, axiom, rules):
     start_string = axiom
@@ -81,18 +79,32 @@ def create_l_system(iters, axiom, rules):
 
     return end_string
 
+def run_code():
+    # Get the code from the text editor
+    code = text_editor.get("1.0", tk.END)
+
+    exec(code)
+    with open("D:\Repos\Python\Fractal turtle\script.py", "w") as f:
+        f.write(code)
+    
 wn = turtle.Screen()
-# wn.tracer(0)
 width, height = 450, 450
 wn.setup(width, height)
 
-instruction = "d5/a90/"
-axiom = "F-X"
-rules = {"F":"F+F", "X":"F-F"}
-iterations = 5
+# Create the main window
+window = tk.Tk()
 
-instruction = instruction + create_l_system(iterations, axiom, rules)
+# Create the text editor
+text_editor = ScrolledText(window, height=20, width=50)
+text_editor.pack()
+with open("D:\Repos\Python\Fractal turtle\script.py", "r") as f:
+    text_editor.insert(tk.END, f.read())
 
-draw_l_system(turtle.Turtle(), instruction)
-
-wn.mainloop()
+stop = True
+# Create the run button
+run_button = tk.Button(window, text="Run", command=run_code)
+run_button.pack()
+clear_button = tk.Button(window, text="Clear", command=wn.clear)
+clear_button.pack()
+# Run the main loop
+window.mainloop()
